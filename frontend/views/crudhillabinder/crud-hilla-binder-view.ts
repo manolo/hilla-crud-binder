@@ -4,7 +4,7 @@ import '@polymer/iron-icon';
 import '@vaadin/button';
 import '@vaadin/checkbox';
 import '@vaadin/crud';
-import type { CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent, CrudSaveEvent } from '@vaadin/crud';
+import type { Crud, CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent, CrudSaveEvent } from '@vaadin/crud';
 import '@vaadin/date-picker';
 import '@vaadin/date-time-picker';
 import '@vaadin/form-layout';
@@ -18,12 +18,14 @@ import Person from 'Frontend/generated/es/manolo/data/entity/Person';
 import Direction from 'Frontend/generated/org/springframework/data/domain/Sort/Direction';
 import * as PersonEndpoint from 'Frontend/generated/PersonEndpoint';
 import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { View } from '../view';
 
 @customElement('crud-hilla-binder-view')
 export class CrudHillaBinderView extends View {
   private dataProvider = this.getData.bind(this);
+  @query("#crud")
+  private crud!: Crud<Person>;
 
   render() {
     return html`
@@ -77,6 +79,7 @@ export class CrudHillaBinderView extends View {
   private async doServerAction(fnc: () => Promise<Person|void>, msg: string) {
     try {
       await fnc();
+      (this.crud as any)._grid.clearCache();
       Notification.show(msg, { position: 'bottom-start' });
     } catch (error: any) {
       if (error instanceof EndpointError || error instanceof ValidationError) {
