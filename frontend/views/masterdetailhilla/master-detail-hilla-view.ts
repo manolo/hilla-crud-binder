@@ -5,12 +5,11 @@ import '@vaadin/date-picker';
 import '@vaadin/date-time-picker';
 import '@vaadin/form-layout';
 import '@vaadin/grid';
-import { Grid, GridDataProviderCallback, GridDataProviderParams } from '@vaadin/grid';
+import type { Grid, GridDataProviderCallback, GridDataProviderParams } from '@vaadin/grid';
 import '@vaadin/grid/vaadin-grid-sort-column';
 import '@vaadin/horizontal-layout';
 import '@vaadin/icon';
 import '@vaadin/icons';
-import '@vaadin/notification';
 import { Notification } from '@vaadin/notification';
 import '@vaadin/polymer-legacy-adapter';
 import '@vaadin/split-layout';
@@ -23,7 +22,7 @@ import PersonModel from 'Frontend/generated/es/manolo/data/entity/PersonModel';
 import Direction from 'Frontend/generated/org/springframework/data/domain/Sort/Direction';
 import * as PersonEndpoint from 'Frontend/generated/PersonEndpoint';
 import { html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, state, query } from 'lit/decorators.js';
 import { View } from '../view';
 
 @customElement('master-detail-hilla-view')
@@ -31,7 +30,7 @@ export class MasterDetailHillaView extends View {
   @query('#grid')
   private grid!: Grid;
 
-  @property({ type: Number })
+  @state()
   private gridSize = 0;
 
   private gridDataProvider = this.getGridData.bind(this);

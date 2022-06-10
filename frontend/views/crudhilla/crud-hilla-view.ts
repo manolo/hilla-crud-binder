@@ -4,11 +4,10 @@ import '@polymer/iron-icon';
 import '@vaadin/button';
 import '@vaadin/checkbox';
 import '@vaadin/crud';
-import { CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent, CrudSaveEvent } from '@vaadin/crud';
+import type { CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent, CrudSaveEvent } from '@vaadin/crud';
 import '@vaadin/date-picker';
 import '@vaadin/date-time-picker';
 import '@vaadin/form-layout';
-import '@vaadin/notification';
 import { Notification } from '@vaadin/notification';
 import '@vaadin/polymer-legacy-adapter';
 import '@vaadin/text-field';
@@ -75,7 +74,7 @@ export class CrudHillaView extends View {
     await this.doServerAction(() => PersonEndpoint.delete(e.detail.item.id!), 'Person deleted.');
   }
 
-  private async doServerAction(fnc: () => void, msg: string) {
+  private async doServerAction(fnc: () => Promise<Person|void>, msg: string) {
     try {
       await fnc();
       Notification.show(msg, { position: 'bottom-start' });
