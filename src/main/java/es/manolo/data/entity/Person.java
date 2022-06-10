@@ -1,6 +1,9 @@
 package es.manolo.data.entity;
 
 import dev.hilla.Nonnull;
+import es.manolo.data.constrain.CheckCase;
+import es.manolo.data.constrain.CheckCase.CaseMode;
+
 import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.validation.constraints.Email;
@@ -19,6 +22,7 @@ public class Person extends AbstractEntity {
     private String phone;
     private LocalDate dateOfBirth;
     @Nonnull
+    @CheckCase(value = CaseMode.LOWER, message = "only lowercase is allowed")
     private String occupation;
 
     public String getFirstName() {
@@ -57,5 +61,4 @@ public class Person extends AbstractEntity {
     public void setOccupation(String occupation) {
         this.occupation = occupation;
     }
-
 }

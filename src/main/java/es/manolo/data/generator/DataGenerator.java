@@ -34,7 +34,7 @@ public class DataGenerator {
             personRepositoryGenerator.setData(Person::setEmail, DataType.EMAIL);
             personRepositoryGenerator.setData(Person::setPhone, DataType.PHONE_NUMBER);
             personRepositoryGenerator.setData(Person::setDateOfBirth, DataType.DATE_OF_BIRTH);
-            personRepositoryGenerator.setData(Person::setOccupation, DataType.OCCUPATION);
+            personRepositoryGenerator.setData((a, b) -> a.setOccupation(b.toLowerCase()), DataType.OCCUPATION);
             personRepository.saveAll(personRepositoryGenerator.create(100, seed));
 
             logger.info("Generated demo data");
