@@ -1,20 +1,19 @@
-import { ValidationError } from '@hilla/form';
-import { EndpointError } from '@hilla/frontend';
+import { Binder, field} from '@hilla/form';
 import '@polymer/iron-icon';
 import '@vaadin/button';
 import '@vaadin/checkbox';
 import 'patched-crud/crud';
-import type { Crud, CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent, CrudSaveEvent } from 'patched-crud/crud';
+import type { Crud, CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent} from 'patched-crud/crud';
 import '@vaadin/date-picker';
 import '@vaadin/date-time-picker';
 import '@vaadin/form-layout';
-import { Notification } from '@vaadin/notification';
 import '@vaadin/polymer-legacy-adapter';
 import '@vaadin/text-field';
 import '@vaadin/upload';
 import '@vaadin/vaadin-icons';
 import Sort from 'Frontend/generated/dev/hilla/mappedtypes/Sort';
 import Person from 'Frontend/generated/es/manolo/data/entity/Person';
+import PersonModel from 'Frontend/generated/es/manolo/data/entity/PersonModel';
 import Direction from 'Frontend/generated/org/springframework/data/domain/Sort/Direction';
 import * as PersonEndpoint from 'Frontend/generated/PersonEndpoint';
 import { html } from 'lit';
@@ -26,7 +25,7 @@ export class CrudHillaBinderView extends View {
   private dataProvider = this.getData.bind(this);
   @query("#crud")
   private crud!: Crud<Person>;
-
+  private binder = new Binder<Person, PersonModel>(this, PersonModel, {onSubmit: PersonEndpoint.update});
   render() {
     return html`
       <vaadin-crud
@@ -35,17 +34,16 @@ export class CrudHillaBinderView extends View {
         exclude="Id"
         no-filter
         .dataProvider=${this.dataProvider}
-        @save=${this.save}
+        .binder=${this.binder}
         @delete=${this.delete}
-        @edited-item-changed=${this.requestUpdate}
       >
         <vaadin-form-layout slot="form"
-          ><vaadin-text-field label="First name" id="firstName" path="firstName"></vaadin-text-field
-          ><vaadin-text-field label="Last name" id="lastName" path="lastName"></vaadin-text-field
-          ><vaadin-text-field label="Email" id="email" path="email"></vaadin-text-field
-          ><vaadin-text-field label="Phone" id="phone" path="phone"></vaadin-text-field
-          ><vaadin-date-picker label="Date of birth" id="dateOfBirth" path="dateOfBirth"></vaadin-date-picker
-          ><vaadin-text-field label="Occupation" id="occupation" path="occupation"></vaadin-text-field>
+          ><vaadin-text-field ${field(this.binder.model.firstName)} label="First name" id="firstName" path="firstName"></vaadin-text-field
+          ><vaadin-text-field ${field(this.binder.model.lastName)} label="Last name" id="lastName" path="lastName"></vaadin-text-field
+          ><vaadin-text-field ${field(this.binder.model.email)} label="Email" id="email" path="email"></vaadin-text-field
+          ><vaadin-text-field ${field(this.binder.model.phone)} label="Phone" id="phone" path="phone"></vaadin-text-field
+          ><vaadin-date-picker ${field(this.binder.model.dateOfBirth)} label="Date of birth" id="dateOfBirth" path="dateOfBirth"></vaadin-date-picker
+          ><vaadin-text-field ${field(this.binder.model.occupation)} label="Occupation" id="occupation" path="occupation"></vaadin-text-field>
         </vaadin-form-layout>
       </vaadin-crud>
     `;
@@ -68,25 +66,7 @@ export class CrudHillaBinderView extends View {
     this.classList.add('flex', 'flex-col', 'h-full');
   }
 
-  private async save(e: CrudSaveEvent<Person>) {
-    await this.doServerAction(() => PersonEndpoint.update(e.detail.item), 'Person details stored.');
-  }
-
   private async delete(e: CrudDeleteEvent<Person>) {
-    await this.doServerAction(() => PersonEndpoint.delete(e.detail.item.id!), 'Person deleted.');
-  }
-
-  private async doServerAction(fnc: () => Promise<Person|void>, msg: string) {
-    try {
-      await fnc();
-      (this.crud as any)._grid.clearCache();
-      Notification.show(msg, { position: 'bottom-start' });
-    } catch (error: any) {
-      if (error instanceof EndpointError || error instanceof ValidationError) {
-        Notification.show(`Server error. ${error.message}`, { theme: 'error', position: 'bottom-start' });
-      } else {
-        throw error;
-      }
-    }
+    PersonEndpoint.delete(e.detail.item.id || '');
   }
 }
