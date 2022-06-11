@@ -35,7 +35,7 @@ export class MasterDetailHillaView extends View {
 
   private gridDataProvider = this.getGridData.bind(this);
 
-  private binder = new Binder<Person, PersonModel>(this, PersonModel);
+  private binder = new Binder<Person, PersonModel>(this, PersonModel, {onSubmit: PersonEndpoint.update});
 
   render() {
     return html`
@@ -127,7 +127,7 @@ export class MasterDetailHillaView extends View {
   private async save() {
     try {
       const isNew = !this.binder.value.id;
-      await this.binder.submitTo(PersonEndpoint.update);
+      await this.binder.submit();
       if (isNew) {
         // We added a new item
         this.gridSize++;

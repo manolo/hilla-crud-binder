@@ -600,6 +600,11 @@ class Crud extends SlotMixin(ControllerMixin(ElementMixin(ThemableMixin(PolymerE
       _fullscreenMediaQuery: {
         value: '(max-width: 600px), (max-height: 600px)',
       },
+
+      /**
+       * An optional Binder (tipically a Hilla one) so as we can call validators in crud, and notify user actions.
+       * @type {Binder}
+       */
       binder: {
         type: Object
       }
@@ -1120,7 +1125,7 @@ class Crud extends SlotMixin(ControllerMixin(ElementMixin(ThemableMixin(PolymerE
     }
   }
 
-  
+
   /** @private */
   __editedItemChanged(item) {
     if (!this._form) {
@@ -1222,7 +1227,7 @@ class Crud extends SlotMixin(ControllerMixin(ElementMixin(ThemableMixin(PolymerE
 
   /** @private */
   async __save() {
-    if (this.binder && !await this.binder.validate()) {
+    if (this.binder && (await this.binder.validate()).length) {
       return;
     }
     if (!this.binder && !this.__validate()) {
@@ -1240,20 +1245,20 @@ class Crud extends SlotMixin(ControllerMixin(ElementMixin(ThemableMixin(PolymerE
     }
     const evt = this.dispatchEvent(new CustomEvent('save', { detail: { item }, cancelable: true }));
     if (evt) {
-      if (this.__isNew && !this.dataProvider) {
-        if (!this.items) {
-          this.items = [item];
-        } else {
-          this.items.push(item);
+      if (this.binder) {
+        const retItem = await this.binder.submit();
+        if (retItem) {
+          this.editedItem = retItem;
         }
       } else {
         this.editedItem = this.editedItem || {};
         Object.assign(this.editedItem, item);
       }
-      if (this.binder) {
-        const retItem = await this.binder.submit();
-        if (retItem) {
-          this.editedItem = retItem;
+      if (this.__isNew && !this.dataProvider) {
+        if (!this.items) {
+          this.items = [item];
+        } else {
+          this.items.push(item);
         }
       }
       this._grid.clearCache();

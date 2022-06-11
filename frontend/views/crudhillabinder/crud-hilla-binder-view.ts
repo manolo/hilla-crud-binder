@@ -3,7 +3,7 @@ import '@polymer/iron-icon';
 import '@vaadin/button';
 import '@vaadin/checkbox';
 import 'patched-crud/crud';
-import type { Crud, CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent} from 'patched-crud/crud';
+import { Crud, CrudDataProviderCallback, CrudDataProviderParams, CrudDeleteEvent} from 'patched-crud/crud';
 import '@vaadin/date-picker';
 import '@vaadin/date-time-picker';
 import '@vaadin/form-layout';
@@ -36,6 +36,8 @@ export class CrudHillaBinderView extends View {
         .dataProvider=${this.dataProvider}
         .binder=${this.binder}
         @delete=${this.delete}
+        editor-position=aside
+        edit-on-click
       >
         <vaadin-form-layout slot="form"
           ><vaadin-text-field ${field(this.binder.model.firstName)} label="First name" id="firstName" path="firstName"></vaadin-text-field
@@ -62,8 +64,12 @@ export class CrudHillaBinderView extends View {
     callback(data, size);
   }
 
+  cc!: Crud<Person>;
+
   async firstUpdated() {
     this.classList.add('flex', 'flex-col', 'h-full');
+    this.cc.binder = this.binder;
+
   }
 
   private async delete(e: CrudDeleteEvent<Person>) {
